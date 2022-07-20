@@ -2,6 +2,6 @@
 apt-get update
 apt install apache2 -y
 systemctl status apache2
-apt-get update
+#apt-get update
 apt install ssh
 
