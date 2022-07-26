@@ -6,6 +6,7 @@ pipeline {
             steps {
                 echo 'Hello World'
                 echo 'welcome to inadev'
+                echo 'welcome'
             }
         }
     }
