@@ -9,11 +9,5 @@ pipeline {
                 
             }
         }
-        stage('git clone') {
-            steps {
-                git clone https://github.com/subham258/assesment.git
-                
-             }
-        }   
     }
 }
