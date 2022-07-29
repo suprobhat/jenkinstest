@@ -5,7 +5,7 @@ pipeline {
         stage('Hello') {
             steps {
                 echo 'Hello World'
-                echo 'welcome to inadev'
+                echo 'welcome to github'
                 
             }
         }
