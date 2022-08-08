@@ -189,7 +189,7 @@ spec:
         //     }
         // }
                                         
-        // stage('Build Docker Image') {            
+        stage('Build Docker Image') {            
         //     steps {
         //         dir ("${WORKSPACE}/${ApplicationDirName}") {  
         //             script {
