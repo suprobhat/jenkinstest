@@ -1,22 +1,63 @@
 pipeline {
     agent any
-
+    
     stages {
-        stage('Hello') {
+        stage('configuration') {
             steps {
-                echo 'Hello World'
-                echo 'welcome to suprobhat'
-                
+                echo 'BRANCH NAME: ' + env.BRANCH_NAME
+                echo sh(returnStdout: true, script: 'env')
             }
         }
-        stage('git clone') {
+        
+        stage('Testing') {
             steps {
-                git clone https://github.com/subham258/assesment.git
-                
-             }
-        }   
+                script {
+                    sh 'echo "Testing"'
+                    
+                }
+            }
+        }
+        
+        stage("build"){
+            when {
+                branch 'dev'
+            }
+            
+            steps{
+                sh 'echo "Build Started"'
+            }
+        }
+
+        stage("Deploy"){
+            when {
+                branch 'main'
+            }
+            
+            steps{
+                sh 'echo "Deploying App"'
+            }
+        }
+    }
+    
+    post{
+        success{
+            setBuildStatus("Build succeeded", "SUCCESS");
+        }
+
+        failure {
+            setBuildStatus("Build failed", "FAILURE");
+        } 
     }
 }
 
+void setBuildStatus(String message, String state) {
+    step([
+        $class: "GitHubCommitStatusSetter",
+        reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/vaibhavkumar779/multibranchJenkinsPRbuildStatus"],
+        contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+        errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+        statusResultSource: [$class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]]]
+    ]);
+}
 
 
