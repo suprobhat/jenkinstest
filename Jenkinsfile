@@ -1,41 +1,61 @@
 pipeline {
-  agent any
-  triggers {
-    GenericTrigger(
-     genericVariables: [
-      //[key: 'pr_id', value: '$.pull_request.id'],
-      //[key: 'pr_state', value: '$.pull_request.state'],
-      [key: 'repo_git_url', value: '$.pull_request.head.repo.clone_url'],
-      [key: 'pr_branch', value: '$.pull_request.head.ref'],
-      [key: 'base_branch', value: '$.pull_request.base.ref']
-      
-     ],
+    agent any
+    
+    stages {
+        stage('configuration') {
+            steps {
+                echo 'BRANCH NAME: ' + env.BRANCH_NAME
+                echo sh(returnStdout: true, script: 'env')
+            }
+        }
+        
+        stage('Testing') {
+            steps {
+                script {
+                    sh 'echo "Testing"'
+                    
+                }
+            }
+        }
+        
+        stage("build"){
+            when {
+                branch 'dev'
+            }
+            
+            steps{
+                sh 'echo "Build Started"'
+            }
+        }
 
-     //causeString: 'Triggered on $pr_id',
-     //causeString: 'Triggered on $pr_state',
-
-     token: '1234',
-     tokenCredentialId: '',
-
-     printContributedVariables: true,
-     printPostContent: true,
-
-     silentResponse: false,
-
-     //regexpFilterText: '$ref',
-     //regexpFilterText: '$pr_state',
-     //regexpFilterExpression: 'refs/heads/' + any
-    )
-  }
-  stages {
-    stage('Some step') {
-      steps {
-        //sh "echo $pr_id"
-        //sh "echo $pr_state"
-        sh "echo hello"
-        //sh "echo $pr_branch"
-        //sh "echo $base_branch"
-      }
+        stage("Deploy"){
+            when {
+                branch 'main'
+            }
+            
+            steps{
+                sh 'echo "Deploying App"'
+            }
+        }
     }
-  }
+    
+    post{
+        success{
+            setBuildStatus("Build succeeded", "SUCCESS");
+        }
+
+        failure {
+            setBuildStatus("Build failed", "FAILURE");
+        } 
+    }
+}
+
+void setBuildStatus(String message, String state) {
+    step([
+        $class: "GitHubCommitStatusSetter",
+        reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/vaibhavkumar779/multibranchJenkinsPRbuildStatus"],
+        contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
+        errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+        statusResultSource: [$class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]]]
+    ]);
 }
