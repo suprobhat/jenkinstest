@@ -14,7 +14,7 @@ pipeline {
      //causeString: 'Triggered on $pr_id',
      //causeString: 'Triggered on $pr_state',
 
-     token: '12345',
+     token: '1234',
      tokenCredentialId: '',
 
      printContributedVariables: true,
